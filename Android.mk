@@ -8,8 +8,10 @@ common_src_files := \
 	NetlinkManager.cpp \
 	NetlinkHandler.cpp \
 	Process.cpp \
+	fs/Exfat.cpp \
 	fs/Ext4.cpp \
 	fs/F2fs.cpp \
+	fs/Ntfs.cpp \
 	fs/Vfat.cpp \
 	Loop.cpp \
 	Devmapper.cpp \
@@ -19,6 +21,7 @@ common_src_files := \
 	VoldUtil.c \
 	cryptfs.cpp \
 	Disk.cpp \
+	DiskPartition.cpp \
 	VolumeBase.cpp \
 	PublicVolume.cpp \
 	PrivateVolume.cpp \
@@ -90,6 +93,21 @@ ifeq ($(TARGET_USERIMAGES_USE_EXT4), true)
   else
     required_modules += make_ext4fs
   endif
+endif
+
+ifeq ($(TARGET_HW_DISK_ENCRYPTION),true)
+  TARGET_CRYPTFS_HW_PATH ?= vendor/qcom/opensource/cryptfs_hw
+  common_c_includes += $(TARGET_CRYPTFS_HW_PATH)
+  common_shared_libraries += libcryptfs_hw
+  vold_cflags += -DCONFIG_HW_DISK_ENCRYPTION
+endif
+
+ifeq ($(TARGET_KERNEL_HAVE_EXFAT),true)
+  vold_cflags += -DCONFIG_KERNEL_HAVE_EXFAT
+endif
+
+ifeq ($(TARGET_KERNEL_HAVE_NTFS),true)
+vold_cflags += -DCONFIG_KERNEL_HAVE_NTFS
 endif
 
 include $(CLEAR_VARS)
